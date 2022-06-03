@@ -55,12 +55,12 @@ export default {
     },
     async uploadToIPFS() {
       const { name, description, price } = this.formInput
-      if (!name || !description || !price || !fileUrl) return
+      if (!name || !description || !price || !this.fileUrl) return
       /* first, upload metadata to IPFS */
       const data = JSON.stringify({
         name,
         description,
-        image: fileUrl,
+        image: this.fileUrl,
       })
       try {
         const added = await client.add(data)
