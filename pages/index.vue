@@ -37,7 +37,11 @@ export default {
     }
   },
 
-  created: {
+  created() {
+    this.loadNFTs()
+  },
+
+  methods: {
     async loadNFTs() {
       /* create a generic provider and query for unsold market items */
       const provider = new ethers.providers.JsonRpcProvider()
