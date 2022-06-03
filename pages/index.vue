@@ -1,87 +1,103 @@
 <template>
   <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <v-card class="logo py-4 d-flex justify-center">
-        <NuxtLogo />
-        <VuetifyLogo />
-      </v-card>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>
-            Vuetify is a progressive Material Design component framework for
-            Vue.js. It was designed to empower developers to create amazing
-            applications.
-          </p>
-          <p>
-            For more information on Vuetify, check out the
-            <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation </a
-            >.
-          </p>
-          <p>
-            If you have questions, please join the official
-            <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord </a
-            >.
-          </p>
-          <p>
-            Find a bug? Report it on the github
-            <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board </a
-            >.
-          </p>
-          <p>
-            Thank you for developing with Vuetify and I look forward to bringing
-            more exciting features in the future.
-          </p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
+    <h1 v-if="!loaded && nft.length">No items in marketplace</h1>
+    <div>
+      <div v-for="nft in nfts" :key="nft.tokenId">
+        <img :src="nft.image" />
+        <div>
+          <p>{{ nft.name }}</p>
+          <div>
+            <p>{{ nft.description }}</p>
           </div>
-          <hr class="my-3" />
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt Documentation
-          </a>
-          <br />
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" nuxt to="/inspire"> Continue </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
+        </div>
+        <div>
+          <p>{{ nft.price }} ETH</p>
+          <button @click="buyNFT(nft)">Buy</button>
+        </div>
+      </div>
+    </div>
   </v-row>
 </template>
 
 <script>
+import { ethers } from 'ethers'
+import axios from 'axios'
+import Web3Modal from 'web3modal'
+
+import { marketplaceAddress } from '../config'
+import NFTMarketplace from '../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
+
 export default {
   name: 'IndexPage',
+
+  data() {
+    return {
+      nfts: [],
+      loaded: false,
+    }
+  },
+
+  created() {
+    this.loadNFTs()
+  },
+
+  methods: {
+    async loadNFTs() {
+      /* create a generic provider and query for unsold market items */
+      const provider = new ethers.providers.JsonRpcProvider()
+      const contract = new ethers.Contract(
+        marketplaceAddress,
+        NFTMarketplace.abi,
+        provider
+      )
+      const data = await contract.fetchMarketItems()
+
+      /*
+       *  map over items returned from smart contract and format
+       *  them as well as fetch their token metadata
+       */
+      const items = await Promise.all(
+        data.map(async (i) => {
+          const tokenUri = await contract.tokenURI(i.tokenId)
+          const meta = await axios.get(tokenUri)
+          const price = ethers.utils.formatUnits(i.price.toString(), 'ether')
+          const item = {
+            price,
+            tokenId: i.tokenId.toNumber(),
+            seller: i.seller,
+            owner: i.owner,
+            image: meta.data.image,
+            name: meta.data.name,
+            description: meta.data.description,
+          }
+          return item
+        })
+      )
+
+      this.nfts = items
+      this.loaded = true
+    },
+    async buyNFT(nft) {
+      /* needs the user to sign the transaction, so will use Web3Provider and sign it */
+      const web3Modal = new Web3Modal()
+      const connection = await web3Modal.connect()
+      const provider = new ethers.providers.Web3Provider(connection)
+      const signer = provider.getSigner()
+      const contract = new ethers.Contract(
+        marketplaceAddress,
+        NFTMarketplace.abi,
+        signer
+      )
+
+      /* user will be prompted to pay the asking proces to complete the transaction */
+      const price = ethers.utils.parseUnits(nft.price.toString(), 'ether')
+      const transaction = await contract.createMarketSale(nft.tokenId, {
+        value: price,
+      })
+      await transaction.wait()
+      this.loadNFTs()
+    },
+  },
 }
 </script>
+if (loadingState === 'loaded' && !nfts.length) return () return ( ) }
