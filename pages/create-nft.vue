@@ -7,7 +7,7 @@
           v-model="formInput.description"
           placeholder="Asset Description"
         />
-        <input v-model="price" placeholder="Asset Price in Eth" />
+        <input v-model="formInput.price" placeholder="Asset Price in Eth" />
         <input type="file" name="Asset" @change="onChange" />
         {{ fileUrl }}
         <img width="350" :src="fileUrl" />
@@ -72,14 +72,14 @@ export default {
       }
     },
     async listNFTForSale() {
-      const url = await uploadToIPFS()
+      const url = await this.uploadToIPFS()
       const web3Modal = new Web3Modal()
       const connection = await web3Modal.connect()
       const provider = new ethers.providers.Web3Provider(connection)
       const signer = provider.getSigner()
 
       /* create the NFT */
-      const price = ethers.utils.parseUnits(formInput.price, 'ether')
+      const price = ethers.utils.parseUnits(this.formInput.price, 'ether')
       const contract = new ethers.Contract(
         marketplaceAddress,
         NFTMarketplace.abi,
