@@ -1,7 +1,11 @@
 {
-  "name": "NFT-marketplace",
+  "name": "nft-marketplace",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "npm": ">=7.0.0",
+    "node": ">=16.0.0"
+  },
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
@@ -13,13 +17,23 @@
     "lintfix": "prettier --write --list-different . && yarn lint:js --fix"
   },
   "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.6",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@nuxtjs/axios": "^5.13.6",
+    "@openzeppelin/contracts": "^4.6.0",
+    "axios": "^0.27.2",
+    "chai": "^4.3.6",
     "core-js": "^3.19.3",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.8",
+    "hardhat": "^2.9.6",
+    "ipfs-http-client": "^56.0.3",
     "nuxt": "^2.15.8",
     "vue": "^2.6.14",
     "vue-server-renderer": "^2.6.14",
     "vue-template-compiler": "^2.6.14",
     "vuetify": "^2.6.1",
+    "web3modal": "^1.9.7",
     "webpack": "^4.46.0"
   },
   "devDependencies": {
