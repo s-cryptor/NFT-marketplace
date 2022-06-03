@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center" align="center">
-    <h1 v-if="!loaded && nft.length">No items in marketplace</h1>
+    <h1 v-if="!loaded || !nfts.length">No items in marketplace</h1>
     <div>
       <div v-for="nft in nfts" :key="nft.tokenId">
         <img :src="nft.image" />
@@ -44,7 +44,9 @@ export default {
   methods: {
     async loadNFTs() {
       /* create a generic provider and query for unsold market items */
-      const provider = new ethers.providers.JsonRpcProvider()
+      const provider = new ethers.providers.JsonRpcProvider(
+        'http://localhost:8545'
+      )
       const contract = new ethers.Contract(
         marketplaceAddress,
         NFTMarketplace.abi,
@@ -100,4 +102,3 @@ export default {
   },
 }
 </script>
-if (loadingState === 'loaded' && !nfts.length) return () return ( ) }

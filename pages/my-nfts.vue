@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center" align="center">
-    <h1 v-if="!loaded && nft.length">No NFTs owned</h1>
+    <h1 v-if="!loaded || !nfts.length">No NFTs owned</h1>
     <div>
       <div>
         <div v-for="nft in nfts" :key="nft.tokenId">
